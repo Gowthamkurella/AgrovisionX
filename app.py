@@ -1,5 +1,6 @@
 from flask import Flask, render_template,request,jsonify
 from PIL import Image
+from io import BytesIO
 import os
 import torchvision.transforms.functional as TF
 import CNN
@@ -48,12 +49,8 @@ def handle_image_upload():
     image = request.files['file']
     if image.filename == '':
         return jsonify({'error': 'No selected file'}), 400
-    print(image)
-    filename = image.filename
-    file_path = os.path.join('assets/uploads', filename)
-    image.save(file_path)
-    print(file_path)
-    pred = prediction(file_path)
+    image_bytes = BytesIO(image.read())
+    pred = prediction(image_bytes)
     title = disease_info['disease_name'][pred]
     description =disease_info['description'][pred]
     prevent = disease_info['Possible Steps'][pred]
